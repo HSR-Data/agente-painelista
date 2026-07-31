@@ -51,18 +51,18 @@ Você também precisa, **uma vez só**, do **Driver ODBC 18 da Microsoft**:
 1. **Conecte a VPN** da empresa (sem ela não alcança o banco).
 2. No Terminal, ative o ambiente: `source .venv/bin/activate`.
 3. Abra esta pasta no **Claude Code**.
-4. Digite o comando com a sua pergunta:
+4. **Peça em português** o que você quer buscar — o Claude ativa sozinho a skill
+   **buscar-painelistas**. Exemplos:
 
    ```
-   /buscar-painelistas pessoas que são clientes do Nubank
+   quantas pessoas são clientes do Nubank?
+   quem assina Netflix
+   quero os possuidores de seguro de vida
+   clientes do Itaú
    ```
 
-   Pode escrever à vontade, em português — por exemplo:
-   - `/buscar-painelistas quem assina Netflix`
-   - `/buscar-painelistas possuidores de seguro de vida`
-   - `/buscar-painelistas clientes do Itaú`
-
-   (Se digitar só `/buscar-painelistas`, o agente pergunta o que você quer buscar.)
+   Se preferir, pode chamar a skill pelo nome: **"use a skill buscar-painelistas"**.
+   Se você não disser o que buscar, o agente pergunta.
 
 ---
 
