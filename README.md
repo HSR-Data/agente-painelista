@@ -10,6 +10,9 @@ o item (e não quem só opinou ou viu propaganda) e te responde:
 - Quantos são **painelistas Fala.e** (têm PainelistaID);
 - E, se você quiser, um **CSV** com o resultado.
 
+> 🚀 **É sua primeira vez e não é da área técnica?** Siga o **[GUIA-RÁPIDO](GUIA-RAPIDO.md)** —
+> passo a passo com textos prontos para copiar e colar.
+
 ---
 
 ## ⚠️ Antes de começar (leia isto)
@@ -62,20 +65,18 @@ seu sistema (é o único item que às vezes precisa ser instalado à parte, uma 
 ## Como usar
 
 1. **Conecte a VPN** da empresa (sem ela não alcança o banco).
-2. No Terminal, ative o ambiente: `source .venv/bin/activate`.
-3. Abra esta pasta no **Claude Code**.
-4. **Peça em português** o que você quer buscar — o Claude ativa sozinho a skill
-   **buscar-painelistas**. Exemplos:
+2. Abra esta pasta no **Claude Code**.
+3. Chame com o comando **`/buscar-painelistas`** seguido do que você quer buscar:
 
    ```
-   quantas pessoas são clientes do Nubank?
-   quem assina Netflix
-   quero os possuidores de seguro de vida
-   clientes do Itaú
+   /buscar-painelistas quem assina Netflix
+   /buscar-painelistas pessoas que são clientes do Nubank
+   /buscar-painelistas possuidores de seguro de vida
+   /buscar-painelistas clientes do Itaú
    ```
 
-   Se preferir, pode chamar a skill pelo nome: **"use a skill buscar-painelistas"**.
-   Se você não disser o que buscar, o agente pergunta.
+   Também funciona pedindo em português normal (ex.: *"quantas pessoas assinam Netflix?"*) — o Claude
+   ativa a skill **buscar-painelistas** sozinho. Se você não disser o que buscar, o agente pergunta.
 
 ---
 
