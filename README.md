@@ -12,13 +12,28 @@ o item (e não quem só opinou ou viu propaganda) e te responde:
 
 ---
 
+## ⚠️ Antes de começar (leia isto)
+
+Esta ferramenta **roda no seu computador** (é ele que está na VPN e alcança o banco). Por isso ela
+funciona pelo **Claude Code** — o app do Claude instalado no computador, que consegue executar as
+buscas na sua máquina.
+
+- ✅ **Claude Code** (app no computador): funciona.
+- ❌ **Chat do Claude no navegador (claude.ai):** *não* funciona — ele roda na nuvem, não no seu
+  computador, e não enxerga o banco interno da empresa.
+
+Então: **instale o Claude Code** (uma vez) antes de seguir. O resto abaixo você pode até pedir pro
+próprio Claude Code fazer, conversando.
+
+---
+
 ## Passo a passo (faça uma vez)
 
 ### 1. Baixe o projeto
-```bash
-git clone https://github.com/HSR-Data/agente-painelista.git
-cd agente-painelista
-```
+Duas formas — escolha a mais fácil pra você:
+- **Pelo GitHub (mais simples):** na página do repositório, clique em **Code → Download ZIP**,
+  e descompacte numa pasta.
+- **Ou peça ao Claude Code:** *"clone o repositório https://github.com/HSR-Data/agente-painelista"*.
 
 ### 2. Coloque o arquivo `.env` na pasta
 Peça o arquivo com as credenciais para quem te indicou a ferramenta e **cole-o dentro da pasta
@@ -32,17 +47,15 @@ Peça o arquivo com as credenciais para quem te indicou a ferramenta e **cole-o 
 >
 > 💡 No macOS, para ver/renomear arquivos que começam com ponto, aperte `Cmd + Shift + .` no Finder.
 
-### 3. Instale o que precisa
-Abra o Terminal **dentro da pasta** e rode:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate          # no Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
+### 3. Instale o que precisa (um instalador cuida disso)
+Tem um instalador que confere tudo pra você. Escolha uma:
+- **Dois cliques:** `instalar.command` (macOS) ou `instalar.bat` (Windows).
+- **Ou peça ao Claude Code:** *"rode o instalar.py"*.
+- **Ou no Terminal, dentro da pasta:** `python instalar.py`
 
-Você também precisa, **uma vez só**, do **Driver ODBC 18 da Microsoft**:
-- **macOS:** `brew install msodbcsql18` (após `brew tap microsoft/mssql-release https://github.com/microsoft/homebrew-mssql-release`)
-- **Windows:** baixe *"ODBC Driver 18 for SQL Server"* no site da Microsoft.
+Ele instala as bibliotecas, confere o **Driver ODBC** e valida o `.env`, e no final diz o que está
+pronto e o que falta. Se faltar o **Driver ODBC 18 da Microsoft**, ele mostra o comando certo para o
+seu sistema (é o único item que às vezes precisa ser instalado à parte, uma vez só).
 
 ---
 
