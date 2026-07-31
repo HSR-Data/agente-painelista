@@ -1,0 +1,17 @@
+# Credenciais — nunca versionar
+.env
+.env.txt
+.env.real
+env.txt
+env-credenciais.txt
+/env
+
+# Arquivos de trabalho e resultados
+dados_tmp/
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
