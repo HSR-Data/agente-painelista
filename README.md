@@ -6,9 +6,8 @@ Ferramenta para descobrir **quantas pessoas da base representam um conceito** �
 Você faz uma pergunta em português. O agente busca na base, separa **quem realmente possui/usa**
 o item (e não quem só opinou ou viu propaganda) e te responde:
 
-- **Respondentes totais** que se encaixam;
-- Quantos são **painelistas Fala.e** (têm PainelistaID);
-- E, se você quiser, um **CSV** com o resultado.
+- **quantos painelistas** do Fala.e se encaixam;
+- e um **CSV** com essas pessoas.
 
 > 🚀 **É sua primeira vez e não é da área técnica?** Siga o **[GUIA-RÁPIDO](GUIA-RAPIDO.md)** —
 > passo a passo com textos prontos para copiar e colar.
@@ -82,24 +81,29 @@ seu sistema (é o único item que às vezes precisa ser instalado à parte, uma 
 
 ## O que você recebe
 
-O agente responde com o número de pessoas:
+A resposta traz o número de pessoas do painel:
 
 ```
-Respondentes totais:        7.145
-Com PainelistaID (Fala.e):  2.911
+Encontrei 53.278 painelistas que são clientes do Nubank.
 ```
 
-Depois ele pergunta se você quer o **CSV**. Se disser **sim**, ele salva um arquivo
-`resultado_<termo>.csv` na pasta, com uma linha por pessoa e estas colunas:
+E um **CSV** (`resultado_<termo>.csv`), com **uma linha por pessoa**:
 
 | Coluna | O que é |
 |---|---|
-| `id` | código do respondente |
-| `painelistaid` | código do painelista Fala.e (fica **vazio** se a pessoa não for painelista) |
-| `codjob` | a pesquisa de onde veio |
-| `infoid` | o tema da pergunta |
+| `painelistaid` | identificador da pessoa no painel Fala.e |
+| `data_resposta` | data da **resposta mais recente** dela sobre o tema |
 
----
+> Se a pessoa respondeu em várias pesquisas, fica a data mais recente — é a evidência mais
+> atual de que ela se encaixa no perfil. (Não é a data em que virou cliente.)
+
+Se você também precisar saber **de qual pesquisa** veio a resposta, peça: existe uma versão
+`resultado_<termo>_detalhado.csv` com as colunas `codjob` e `codquestao`, já pronta.
+
+### Por que o número é de painelistas, e não de respondentes
+Uma pessoa recebe um **código de respondente diferente a cada pesquisa** que participa. Só o
+`painelistaid` (vinculado a um CPF único) identifica a pessoa. Contar códigos de respondente
+inflaria o resultado várias vezes — por isso o número reportado é sempre o de painelistas.
 
 ## Se algo der errado
 
