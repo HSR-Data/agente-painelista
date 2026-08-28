@@ -35,6 +35,11 @@ def main():
     por_grupo, termo, tc, ta, rej = {}, None, 0, 0, 0
     for f in arquivos:
         d = json.load(open(f, encoding="utf-8"))
+        # Cinto de segurança: nunca misturar julgamentos de buscas diferentes.
+        if termo and d.get("termo") and d["termo"] != termo:
+            sys.exit(f"ERRO: {os.path.basename(f)} é do termo '{d['termo']}', "
+                     f"mas os outros são de '{termo}'. Sobrou lixo de uma busca anterior "
+                     f"em dados_tmp/ — apague os validado_*.json e rode os lotes de novo.")
         termo = termo or d.get("termo")
         tc += int(d.get("total_candidatos") or 0)
         ta += int(d.get("total_avaliados") or 0)

@@ -154,6 +154,19 @@ def main():
     for i, c in enumerate(cands):
         baldes[i % n].append(c)         # round-robin: equilibra volume entre lotes
 
+    # Um novo split invalida qualquer julgamento anterior. Se sobrarem `validado_N.json`
+    # de uma busca passada com MAIS lotes, o glob do juntar_validados os recolhe e mistura
+    # decisões de outro termo no resultado — sem avisar. Já aconteceu.
+    import glob as _glob
+    tmp = os.path.dirname(a.prefixo)
+    velhos = sorted(_glob.glob(os.path.join(tmp, "validado*.json")))
+    for v in velhos:
+        os.remove(v)
+    for v in sorted(_glob.glob(f"{a.prefixo}_*.json")):
+        os.remove(v)
+    if velhos:
+        print(f"  [limpeza] {len(velhos)} julgamento(s) de busca anterior removidos")
+
     for i, b in enumerate(baldes, 1):
         caminho = f"{a.prefixo}_{i}.json"
         gravar(caminho, {"termo": seed["termo"], "lote": i, "de": n, "total": len(b)}, b)
