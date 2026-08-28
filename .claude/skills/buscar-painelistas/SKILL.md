@@ -42,15 +42,24 @@ Agrupa perguntas idênticas em **padrões**, então uma decisão vale para todas
 - `[VAZIO]` → avise que nada casou, sugira outro termo e **pare**.
 - **Não leia** `dados_tmp/seed.json` — é grande e encheria seu contexto.
 
-## Passo 2 — Dividir em lotes
+## Passo 2 — Filtrar e dividir
 ```
-python scripts/dividir_seed.py --lotes <N>
+python scripts/dividir_seed.py --lotes 4
 ```
-**N ≈ total de padrões ÷ 250**, mínimo 1, máximo 8.
+**Use 4 lotes** para qualquer volume até ~1.200 padrões após o filtro. Acima disso, some 1 lote a
+cada 250 padrões extras, até o máximo de 6.
 
-> Por que dividir: um subagente com mais de ~300 padrões atravessa o limite de contexto e passa a
-> errar. Já aconteceu — 1.545 padrões numa tarefa só deram 39 aceites, contra **273** em 6 lotes,
-> com perguntas óbvias de posse sendo rejeitadas por engano.
+O script já vem com payload enxuto e pré-filtro determinístico ligados; ele imprime quantos
+padrões descartou por regra. Se aparecer um descarte grande e inesperado, confira antes de seguir.
+
+> **Não aumente o número de lotes achando que barateia — encarece.** Medido: os mesmos 992
+> padrões custaram 451k tokens em 4 lotes e 567k em 8, porque cada subagente tem ~50k de custo
+> fixo. E lotes pequenos deixam o julgamento mais agressivo: a rodada de 8 rejeitou 39 padrões
+> legítimos de posse e perdeu 1.291 painelistas.
+
+> O que **não** fazer: gravar o lote indentado. O arquivo passa de 20.000 linhas, o subagente
+> lê em 20 pedaços, o custo cresce ao quadrado e ele pula padrões no meio. Esse defeito sozinho
+> respondia por 4x o custo da busca.
 
 ## Passo 3 — Julgar os lotes EM PARALELO
 Dispare **um subagente `painelista-filter` por lote**, todos **na mesma mensagem**. Em cada prompt

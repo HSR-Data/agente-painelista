@@ -8,6 +8,8 @@ env-credenciais.txt
 
 # Arquivos de trabalho e resultados
 dados_tmp/
+# comparações de custo/qualidade entre configurações — análise local
+bench/
 *.csv
 
 # Python
