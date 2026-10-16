@@ -11,17 +11,26 @@ O foco é **posse/uso real** — nunca opinião, lembrança de propaganda ou con
 
 ## Ambiente
 
-Todos os comandos rodam a partir do projeto:
+A skill é **autossuficiente**: todos os scripts estão na própria pasta da skill. Chame `$SKILL`
+o *base directory* informado quando esta skill foi carregada (ex.:
+`~/.claude/skills/buscar-painelistas` ou `<repo>/.claude/skills/buscar-painelistas`).
 
 ```
-PROJ="${PROJ:-$HOME/Developer/agente-painelista}"   # a pasta onde este repositório foi clonado
-cd "$PROJ" && source .venv/bin/activate             # sem venv: python3 -m venv .venv && pip install -r requirements.txt
+SKILL="<base directory desta skill>"
 ```
 
-Se a pasta não existir, pergunte ao usuário onde ele clonou o repositório — não tente adivinhar.
+Os comandos abaixo rodam **no diretório de trabalho do usuário** (não entre na pasta da skill):
+é lá que ficam `dados_tmp/` e o CSV final.
 
-Requer **VPN ligada** (o banco é interno) e o arquivo `.env` na raiz do projeto.
-Se der `Login timeout expired`, é VPN — peça para o usuário reconectar e tente de novo.
+Antes do primeiro uso, confira (uma vez):
+- `python -c "import pyodbc, dotenv"` — se falhar: `pip install -r "$SKILL/requirements.txt"`.
+- **Driver ODBC 17/18 for SQL Server** instalado (o erro `Nenhum ODBC Driver` diz como instalar).
+- **Credenciais**: um arquivo `.env` com `DB_SERVER`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`,
+  `DB_DATABASE`. Ele é lido do diretório atual ou de `PAINELISTA_ENV_FILE` (variáveis de
+  ambiente já exportadas têm prioridade). Se o usuário não tiver o arquivo, peça para ele
+  obter com quem indicou a ferramenta — **não** invente valores.
+- **VPN ligada** (o banco é interno). Se der `Login timeout expired`, é VPN — peça para o
+  usuário reconectar e tente de novo.
 
 ---
 
@@ -33,7 +42,7 @@ Depois identifique:
 
 ## Passo 1 — Seed
 ```
-python scripts/seed.py --termo "<TERMO>"
+python "$SKILL/scripts/seed.py" --termo "<TERMO>"
 ```
 Busca o termo nas **respostas**, nas **perguntas** e no enunciado da **mãe** dos grids — os três são
 necessários: "Você é usuário Netflix?" com respostas "Sim/Não" só aparece pela pergunta.
@@ -44,7 +53,7 @@ Agrupa perguntas idênticas em **padrões**, então uma decisão vale para todas
 
 ## Passo 2 — Filtrar e dividir
 ```
-python scripts/dividir_seed.py --lotes 4
+python "$SKILL/scripts/dividir_seed.py" --lotes 4
 ```
 **Use 4 lotes** para qualquer volume até ~1.200 padrões após o filtro. Acima disso, some 1 lote a
 cada 250 padrões extras, até o máximo de 6.
@@ -62,8 +71,14 @@ padrões descartou por regra. Se aparecer um descarte grande e inesperado, confi
 > respondia por 4x o custo da busca.
 
 ## Passo 3 — Julgar os lotes EM PARALELO
-Dispare **um subagente `painelista-filter` por lote**, todos **na mesma mensagem**. Em cada prompt
-passe: termo, intenção completa, entrada (`dados_tmp/lote_<i>.json`) e saída
+Dispare **um subagente por lote**, todos **na mesma mensagem**:
+- se o agente **`painelista-filter`** existir neste projeto (repositório clonado), use-o;
+- senão (skill instalada sozinha), use um subagente **`general-purpose` com `model: sonnet`** e
+  cole no prompt o conteúdo de **`$SKILL/references/painelista-filter.md`** como instruções,
+  pedindo que use apenas `Read` e `Write`. Sonnet é o modelo medido como estável; Haiku varia
+  30% entre rodadas.
+
+Em cada prompt passe: termo, intenção completa, entrada (`dados_tmp/lote_<i>.json`) e saída
 (`dados_tmp/validado_<i>.json`), mandando avaliar **todos** os padrões do lote.
 
 Inclua sempre este alerta, que corrige o erro mais comum:
@@ -72,13 +87,16 @@ Inclua sempre este alerta, que corrige o erro mais comum:
 
 ## Passo 4 — Juntar
 ```
-python scripts/juntar_validados.py
+python "$SKILL/scripts/check_coverage.py" && python "$SKILL/scripts/juntar_validados.py"
 ```
-Se aparecer `[AVISO] cobertura parcial`, **avise o usuário**: o número sairá subestimado.
+`check_coverage.py` barra a junção se faltar algum `validado_<i>.json` ou se um lote não
+julgou todos os padrões (`Coverage blocked: ...`): nesse caso rode de novo **só o lote
+faltante** e repita. Se mesmo assim aparecer `[AVISO] cobertura parcial`, **avise o usuário**:
+o número sairá subestimado.
 
 ## Passo 5 — Contar e exportar
 ```
-python scripts/resolve.py --validated dados_tmp/validado.json --out resultado_<termo>.csv
+python "$SKILL/scripts/resolve.py" --validated dados_tmp/validado.json --out resultado_<termo>.csv
 ```
 
 ## Passo 6 — Reportar (CURTO)

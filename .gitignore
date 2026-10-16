@@ -17,3 +17,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Estado local do oh-my-claudecode
+.omc/

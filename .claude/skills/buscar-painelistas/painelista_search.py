@@ -7,10 +7,8 @@ a interpretação é feita pelo agente, na hora da busca, lendo o texto real.
 import os
 import sys
 
-import pyodbc
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from config import DatabaseConfig
+from config import load_database_config
 
 # Collation case- e accent-insensitive: 'netflix' casa 'NETFLIX', 'Nubank' casa 'nubank'.
 COLLATE = "Latin1_General_CI_AI"
@@ -38,6 +36,7 @@ def pick_driver(available) -> str:
 
 
 def make_connection():
+    DatabaseConfig = load_database_config()
     faltando = [nome for nome, val in (
         ("DB_SERVER", DatabaseConfig.SERVER), ("DB_USER", DatabaseConfig.USER),
         ("DB_PASSWORD", DatabaseConfig.PASSWORD), ("DB_DATABASE", DatabaseConfig.DATABASE),
@@ -45,7 +44,9 @@ def make_connection():
     if faltando:
         raise RuntimeError(
             "Configuração do banco incompleta (faltando: " + ", ".join(faltando) + "). "
-            "Coloque o arquivo .env preenchido nesta pasta antes de rodar.")
+            "Coloque o .env na pasta onde você está rodando, ou aponte PAINELISTA_ENV_FILE "
+            "para ele (ou exporte as variáveis DB_*).")
+    import pyodbc
     driver = pick_driver(pyodbc.drivers())
     cs = (
         f"DRIVER={{{driver}}};SERVER={DatabaseConfig.SERVER},{DatabaseConfig.PORT};"

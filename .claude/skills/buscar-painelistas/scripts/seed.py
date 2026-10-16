@@ -18,8 +18,8 @@ Gera dois arquivos:
   grupos.json  → padrão → membros (codJob, CodQuestao, RespostaIDs) — usado pelo resolve
 
 Uso:
-  python scripts/seed.py --termo "Nubank"
-  python scripts/seed.py --termo "Netflix" --incluir-abertas
+  python "$SKILL/scripts/seed.py" --termo "Nubank"
+  python "$SKILL/scripts/seed.py" --termo "Netflix" --incluir-abertas
 """
 import os
 import re
@@ -32,7 +32,7 @@ import unicodedata
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from painelista_search import make_connection, like_pattern, COLLATE
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE = os.getcwd()
 DEFAULT_OUT = os.path.join(BASE, "dados_tmp", "seed.json")
 DEFAULT_GRUPOS = os.path.join(BASE, "dados_tmp", "grupos.json")
 

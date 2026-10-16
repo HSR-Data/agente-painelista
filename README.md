@@ -37,6 +37,18 @@ Duas formas — escolha a mais fácil pra você:
   e descompacte numa pasta.
 - **Ou peça ao Claude Code:** *"clone o repositório https://github.com/HSR-Data/agente-painelista"*.
 
+> 🧩 **Já usa o Claude Code e só quer a skill?** Tudo o que ela precisa (scripts, prompt do
+> julgador, `requirements.txt`) está dentro da pasta `.claude/skills/buscar-painelistas`. Dá para
+> instalar só ela, sem clonar o projeto:
+>
+> ```
+> npx skills add HSR-Data/agente-painelista
+> ```
+>
+> ou copie a pasta para `~/.claude/skills/buscar-painelistas`. Nesse modo, o `.env` fica na pasta
+> em que você abrir o Claude Code (ou aponte a variável `PAINELISTA_ENV_FILE` para ele), e os
+> arquivos de trabalho (`dados_tmp/`, CSVs) são gravados nessa mesma pasta.
+
 ### 2. Coloque o arquivo `.env` na pasta
 Peça o arquivo com as credenciais para quem te indicou a ferramenta e **cole-o dentro da pasta
 `agente-painelista`**. Você vai receber um arquivo chamado **`env.txt`** (ou já **`.env`**).

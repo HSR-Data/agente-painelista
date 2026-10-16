@@ -14,8 +14,8 @@ painelistas; contar CodCliente infla o resultado em ~4x.
 Com --out, grava CSV: id, painelistaid, codjob, codquestao, codresposta
 
 Uso:
-  python scripts/resolve.py --validated dados_tmp/validado.json
-  python scripts/resolve.py --validated dados_tmp/validado.json --out resultado.csv
+  python "$SKILL/scripts/resolve.py" --validated dados_tmp/validado.json
+  python "$SKILL/scripts/resolve.py" --validated dados_tmp/validado.json --out resultado.csv
 """
 import os
 import sys
@@ -161,10 +161,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--validated", required=True)
     ap.add_argument("--grupos", default=os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dados_tmp", "grupos.json"),
+        os.getcwd(), "dados_tmp", "grupos.json"),
         help="Mapa padrão→membros gerado pelo seed.")
     ap.add_argument("--out", default=None,
-                    help="CSV de saída. Colunas: id,painelistaid,codjob,codquestao,codresposta")
+                    help="CSV de saída (painelistaid,data_resposta). Gera também o _detalhado.csv (+codjob,codquestao).")
     a = ap.parse_args()
 
     r = resolve(a.validated, a.out, grupos_path=a.grupos)
