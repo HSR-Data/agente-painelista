@@ -27,8 +27,9 @@ Antes do primeiro uso, confira (uma vez):
 - **Driver ODBC 17/18 for SQL Server** instalado (o erro `Nenhum ODBC Driver` diz como instalar).
 - **Credenciais**: um arquivo `.env` com `DB_SERVER`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`,
   `DB_DATABASE`. Ele é lido do diretório atual ou de `PAINELISTA_ENV_FILE` (variáveis de
-  ambiente já exportadas têm prioridade). Se o usuário não tiver o arquivo, peça para ele
-  obter com quem indicou a ferramenta — **não** invente valores.
+  ambiente já exportadas têm prioridade). O modelo está em `$SKILL/.env.example`. Se o
+  usuário não tiver os valores, peça para ele obter com quem indicou a ferramenta — **não**
+  invente valores.
 - **VPN ligada** (o banco é interno). Se der `Login timeout expired`, é VPN — peça para o
   usuário reconectar e tente de novo.
 
