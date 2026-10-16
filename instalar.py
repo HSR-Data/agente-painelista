@@ -22,7 +22,7 @@ def titulo(t):
 
 def instala_dependencias():
     titulo("1/3  Instalando bibliotecas Python (pyodbc, python-dotenv)")
-    req = os.path.join(AQUI, "requirements.txt")
+    req = os.path.join(AQUI, ".claude", "skills", "buscar-painelistas", "requirements.txt")
     try:
         subprocess.run([sys.executable, "-m", "pip", "install", "-r", req], check=False)
     except Exception as e:

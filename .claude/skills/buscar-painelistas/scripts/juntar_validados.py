@@ -7,7 +7,7 @@ aceite prevalece — e `allResponses` ganha de uma lista de respostas, por ser m
 abrangente.
 
 Uso:
-  python scripts/juntar_validados.py --entradas dados_tmp/validado_*.json
+  python "$SKILL/scripts/juntar_validados.py" --entradas dados_tmp/validado_*.json
 """
 import os
 import sys
@@ -15,7 +15,7 @@ import json
 import glob
 import argparse
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE = os.getcwd()
 
 
 def main():

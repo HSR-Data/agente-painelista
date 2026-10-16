@@ -17,7 +17,7 @@ Payload enxuto e pré-filtro determinístico vêm LIGADOS. Para desligar (depura
 --sem-prefiltro  manda ao LLM até o que a regra rejeitaria sempre
 
 Uso:
-  python scripts/dividir_seed.py --lotes 4
+  python "$SKILL/scripts/dividir_seed.py" --lotes 4
 """
 import os
 import re
@@ -26,7 +26,7 @@ import sys
 import json
 import argparse
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE = os.getcwd()
 
 # --- sugestão 3: regras determinísticas -------------------------------------
 # Rótulo interno de script: não é frase natural, não afirma posse por si só.
@@ -141,7 +141,8 @@ def main():
         for m, gs in sorted(descartados.items(), key=lambda x: -len(x[1])):
             print(f"  [prefiltro] {len(gs):>4} descartados: {m}")
         print(f"  [prefiltro] {len(cands)} -> {len(mantidos)} candidatos para o LLM")
-        with open(os.path.join(BASE, "dados_tmp", "prefiltrados.json"), "w", encoding="utf-8") as f:
+        os.makedirs(os.path.dirname(os.path.abspath(a.prefixo)), exist_ok=True)
+        with open(os.path.join(os.path.dirname(os.path.abspath(a.prefixo)), "prefiltrados.json"), "w", encoding="utf-8") as f:
             json.dump({"total": len(cands) - len(mantidos), "por_motivo": {k: len(v) for k, v in descartados.items()},
                        "grupos": descartados}, f, ensure_ascii=False, indent=1)
         cands = mantidos
@@ -158,7 +159,8 @@ def main():
     # de uma busca passada com MAIS lotes, o glob do juntar_validados os recolhe e mistura
     # decisões de outro termo no resultado — sem avisar. Já aconteceu.
     import glob as _glob
-    tmp = os.path.dirname(a.prefixo)
+    tmp = os.path.dirname(os.path.abspath(a.prefixo))
+    os.makedirs(tmp, exist_ok=True)
     velhos = sorted(_glob.glob(os.path.join(tmp, "validado*.json")))
     for v in velhos:
         os.remove(v)
