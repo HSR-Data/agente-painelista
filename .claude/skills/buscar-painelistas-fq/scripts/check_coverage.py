@@ -28,8 +28,10 @@ def check(directory):
             raise ValueError("Term or batch total mismatch")
         if result.get("total_candidatos") != n or result.get("total_avaliados") != n:
             raise ValueError("Partial coverage")
-        accepted = [v["grupo"] for v in result.get("validados", [])]
-        if len(accepted) != len(set(accepted)) or not set(accepted).issubset(groups):
+        # multi-conceito: o mesmo grupo pode ser aceito uma vez por conceito
+        pairs = [(v["grupo"], v.get("conceito")) for v in result.get("validados", [])]
+        accepted = {g for g, _ in pairs}
+        if len(pairs) != len(set(pairs)) or not accepted.issubset(groups):
             raise ValueError("Unknown or duplicate accepted groups")
         rejected = result.get("rejeitados_resumo", {}).get("total")
         if not isinstance(rejected, int) or rejected < 0 or len(accepted) + rejected != n:

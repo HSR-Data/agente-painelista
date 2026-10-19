@@ -4,7 +4,8 @@
 Cada subagente julgou um lote; a decisão final é a UNIÃO das decisões. Se o mesmo
 grupo aparecer em mais de um lote (não deveria, mas é barato garantir), o primeiro
 aceite prevalece — e `allResponses` ganha de uma lista de respostas, por ser mais
-abrangente.
+abrangente. Em julgamento multi-conceito a chave é (grupo, conceito): o mesmo padrão pode
+valer para "banda larga" com uma opção e para "TV" com outra.
 
 Uso:
   python "$SKILL/scripts/juntar_validados.py" --entradas dados_tmp/validado_*.json
@@ -50,8 +51,9 @@ def main():
             if not g:
                 continue
             n_lote += 1
-            if g not in por_grupo or (v.get("allResponses") and not por_grupo[g].get("allResponses")):
-                por_grupo[g] = v
+            k = (g, v.get("conceito"))
+            if k not in por_grupo or (v.get("allResponses") and not por_grupo[k].get("allResponses")):
+                por_grupo[k] = v
         print(f"  {os.path.basename(f)}: {n_lote} aceitos")
 
     saida = {"termo": termo, "total_candidatos": tc, "total_avaliados": ta,
@@ -59,7 +61,12 @@ def main():
              "rejeitados_resumo": {"total": rej, "padroes": ["ver validados por lote"]}}
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(saida, f, ensure_ascii=False, indent=1)
-    print(f"[OK] {len(por_grupo)} grupos aceitos (de {ta}/{tc} avaliados) em {a.out}")
+    conceitos = {}
+    for g, c in por_grupo:
+        conceitos[c] = conceitos.get(c, 0) + 1
+    if None not in conceitos:
+        print("  por conceito: " + ", ".join(f"{c}={n}" for c, n in sorted(conceitos.items(), key=str)))
+    print(f"[OK] {len({g for g, _ in por_grupo})} grupos aceitos (de {ta}/{tc} avaliados) em {a.out}")
     if tc and ta < tc:
         print(f"[AVISO] cobertura parcial: {tc-ta} padrões não avaliados.")
 

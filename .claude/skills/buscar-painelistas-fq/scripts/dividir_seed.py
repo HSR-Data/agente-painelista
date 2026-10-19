@@ -37,7 +37,11 @@ PROPAGANDA = re.compile(r'propaganda|an[uú]ncio|comercial de|publicidade|lembra
 # painelistas indevidos. Tentei ensinar isso ao modelo e saiu pior — ele ficou conservador
 # em tudo e perdeu 1.517 painelistas legítimos. Como regra em Python é cirúrgico e grátis.
 PREFERENCIA = re.compile(r'prefer[ie]|predile|se pudesse escolher|consideraria', re.I)
-EMPRESA = re.compile(r'(sua|da) empresa (possui|tem|utiliza)|a empresa possui', re.I)
+# Frases inteiras, nunca a palavra "empresa" solta: "Qual a EMPRESA da sua internet banda larga?"
+# (P10C) é posse da pessoa e caiu numa regra por palavra. Olha só pergunta + mãe: o contexto é a
+# pergunta anterior e pode ser da empresa sem que esta seja.
+EMPRESA = re.compile(r'\b(sua|da|na|para a) empresa\b|a empresa possui|empresa (é|e) cliente|'
+                     r'seu neg[oó]cio|atividade profissional|\bcnpj\b', re.I)
 # Verbo de posse: se aparecer, o LLM decide — regra nenhuma descarta.
 # `client` solto de propósito: rótulos de cota ("Cliente Nubank", "Backbook - Cliente
 # Nubank") e respostas como "Eu já sou cliente Nubank" afirmam posse sem verbo algum.
@@ -56,12 +60,18 @@ def motivo_descarte(c):
     # estar na resposta ("Clientes Nubank", "Já uso no Nubank PJ"), não no enunciado.
     # NFC: o banco devolve acento decomposto (E + U+0301). Sem normalizar, um regex
     # com "é" nunca casa — e a regra falha em silêncio, deixando passar/descartando errado.
+    # Condicional: o `contexto` (pergunta anterior pelo NÚMERO, não pela ordem de exibição) não vale
+    # como enunciado — a condição é que diz do que se trata. O grid PF5 ("Vivo" × pré/pós/controle,
+    # 58 mil respondentes) caía como "recall de propaganda" porque a raiz anterior por número era P3
+    # ("lembra de ter visto propaganda"), que nem aparece antes dele no questionário.
+    ctx = "" if c.get("condicao") else (c.get("contexto") or "")
     texto = unicodedata.normalize("NFC", " ".join(
-        [c.get("contexto") or "", c.get("mae") or "", c.get("pergunta") or ""]
+        [ctx, c.get("mae") or "", c.get("pergunta") or ""]
         + [r.get("texto", "") for r in c.get("respostas_match", [])]).strip())
     if ROTULO.match(unicodedata.normalize("NFC", (c.get("mae") or c.get("pergunta") or "").strip())) and not POSSE.search(texto):
         return "rotulo de script"   # "GRAVA BANCOS QUE É CLIENTE" tem prefixo de script MAS afirma posse
-    enunciado = unicodedata.normalize("NFC", ((c.get("contexto") or "") + " " + (c.get("mae") or "") + " " + (c.get("pergunta") or "")))
+    enunciado = unicodedata.normalize("NFC", (ctx + " " + (c.get("mae") or "") + " " + (c.get("pergunta") or "")
+                                              + " " + ((c.get("condicao") or {}).get("pergunta") or "")))
     # Propaganda: o guarda de posse olha SÓ o enunciado, nunca as respostas. Numa pergunta
     # aberta de recall os verbatins citam "cliente" por acaso ("a propaganda é boa, sou
     # cliente há anos") e isso deixava passar 92 padrões — 34% do payload, dos quais a
@@ -72,7 +82,7 @@ def motivo_descarte(c):
         return "recall de propaganda"
     if PREFERENCIA.search(enunciado):
         return "preferencia, nao posse"
-    if EMPRESA.search(enunciado):
+    if EMPRESA.search(unicodedata.normalize("NFC", (c.get("mae") or "") + " " + (c.get("pergunta") or ""))):
         return "posse da empresa, nao do respondente"
     return None
 
@@ -100,11 +110,16 @@ def enxugar(c):
         # anterior. Sem ele, uma linha "Vivo" não diz se é posse ou lembrança.
         "contexto": n(c.get("contexto"), 200),
         "fontes": c.get("fontes"),
+        # Padrão condicional: a pergunta citava a resposta de outra ({RU("P8")...}); o placeholder
+        # já foi trocado pela opção do termo e só contam os que a marcaram na pergunta referida.
         # par [RespostaID, texto] em vez de objeto: as chaves repetidas custavam 28
         # caracteres por resposta, e são 4,6 respostas por candidato em média.
         "match": [[r["RespostaID"], n(r["texto"], 80)] for r in c.get("respostas_match", [])],
         "outras_opcoes": [n(r["texto"], 40) for r in c.get("respostas_amostra", [])[:5]],
     }
+    if c.get("condicao"):
+        out["condicao"] = {"pergunta": n(c["condicao"].get("pergunta"), 200),
+                           "resposta": n(c["condicao"].get("resposta"), 60)}
     # Termo só no enunciado ("Vivo" como linha de grid, "Você é cliente Vivo?"): nenhuma resposta
     # casa, e a posse está numa opção comum ("Banda larga Fixa", "Sim"). Sem os ids dessas
     # opções o subagente não tem o que aceitar — vão em `opcoes`, com id.
